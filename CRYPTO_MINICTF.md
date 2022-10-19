@@ -1,0 +1,20 @@
+# **WRITE UP MINICTF** #
+
+## CRYPTOGRAPHY - **Do you know what is basecrack :>** ##
+------------------------------------
+
+>## ĐỀ BÀI ##
+
+------------------------------------
+
+![img](/CTF/CTF/WU_CTF/image/Screenshot%202022-10-20%20025108.png)
+>## CRYPTO.txt ##
+
+![img](/CTF/CTF/WU_CTF/image/Screenshot%202022-10-20%20025144.png)
+
+>## **Overview & Idea** ##
+
+- Theo như tên đề bài chúng ta hãy lên GOOGLE tìm tên tool basecrack.
+[tool basecrack](https://basecrack.herokuapp.com/)
+
+- Cuối cùng, ta sẽ tìm ra được flag=`ISPCTF{1_you_kn0w_Base_Crack}`.
