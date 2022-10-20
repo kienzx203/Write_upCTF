@@ -1,6 +1,6 @@
 # **WRITE UP MINICTF** #
 
-## REVERSE ENGINEERING - **EZ RE** ##
+## REVERSE ENGINEERING - **`EZ RE`** ##
 
 >## Source Code ##
 
@@ -110,7 +110,7 @@ cout<<s;
 //Flag=ISPCTF{d35cr4mbl3_tH3_cH4r4cT3r5_ff63b0}
 ```
 
-## REVERSE ENGINEERING - **Loop Key** ##
+## REVERSE ENGINEERING - **`Loop Key`** ##
 
 >## Source Code ##
 
@@ -179,7 +179,174 @@ int main(){
 }
 //flag=ISPCTF{T01_co_kh1en_ban_vu1_12112003}
 ```
+--------------------
+## REVERSE ENGINEERING - **`Baby Kinzx`** ##
 
+>## Source Code ##
 
+```C++
+#include<stdio.h>
+#include<string.h>
+#include<Windows.h>
+int main(){
+	
+	puts("Pls, Enter your License : ");
+	char license[]="010010010101001101010000010000110101010001000110011110110101111101100010011010010111010001011111011000100110100101110100011000110110100001011111011000100110010101100001011000110110100001111101";
+	char my_license[100];
+	fgets(my_license,100,stdin);
+	if(strlen(my_license)==25){
+		puts("[+] Checking....");
+		Sleep(3000);
+		int l = (int)strlen(license);
+		unsigned char flag[24] = {};
+		
+		for(int i=0;i<l;i+=8){
+			for(int j=i;j<(i+8);j++){
+				int pos = (int)(i/8);
+				flag[pos] <<= 1;
+				flag[pos] += license[j] - 0x30;
+			}
+		}
+		flag[24]=0;
+		if(memcmp(flag,my_license,24)==0){
+			puts("Cracked!");
+		}else{
+			puts("Are you hacker ?");
+		}
+	}else{
+		puts("Invalid License!");
+	}
+}
+```
 
+>## **Overview & Idea** ##
+
+- Theo ta thấy để nhận được `flag=ISPCTF{}` thì my_license và flag phải bằng nhau và có độ dài 24 kí tự, thuật toán bài này là biến dãy chuỗi nhị phân sang dãy số nhị phân.
+>## Thuật toán :
+```C++
+for(int i=0;i<l;i+=8)
+{
+	for(int j=i;j<(i+8);j++)
+    {
+		int pos = (int)(i/8);
+		flag[pos] <<= 1;
+		flag[pos] += license[j] - 0x30;
+	}
+}
+```
+- Bản chất ở đây nõ sẽ lấy 8 bit lại thành một mảng flag[ i ]. Vậy sau khi hiểu rõ về thuật toán chúng ta có thể coppy đoạn chuỗi lên tool [kt.gy](https://kt.gy/tools.html#conv/) để ra flag=`ISPCTF{_bit_bitch_beach}`
+
+--------------------
+## REVERSE ENGINEERING - **`XOR`** ##
+
+>## Source Code ##
+
+```C++
+#include <stdio.h>
+#include <string.h>
+
+char LAW(char a, char b) {
+    return !(a | b); 
+}
+char LOST(char a) {
+    return LAW(a, a); // luôn in ra 1
+}
+char END(char a, char b) {
+    return LOST(LAW(a, b));
+}
+char OO(char a, char b) {
+    return LOST(END(LOST(a), LOST(b)));
+}
+char ISPCLUB(char a, char b) {
+    return END(OO(a, LOST(b)), OO(LOST(a), b));
+}
+int main() {
+    unsigned char input[15];
+    unsigned char cipher[15] = { 0xe7,0x99,0xdb,0xf6,0x98,0xda,0xf6,0xda,0x99,0xf6,0xe4,0x9d,0xce,0x98,0xca };
+    unsigned char your_cipher[15];
+    char key[] = { 1,0,0,1,0,1,0,1 };
+    printf("Enter Flag : ");
+    fgets((char*)input, sizeof(input) + 1, stdin);
+
+    for (char i = 0; i < sizeof(input); i++) {
+        char tmp[8] = { 0,0,0,0,0,0,0,0 };
+        unsigned char result = 0;
+
+        for (char b = 0; b < 8; b++) {
+            char bit_1 = (input[i] >> b) & 1;
+            char bit_2 = key[b];
+            char rs = ISPCLUB(bit_1, bit_2);
+            tmp[b] = rs;
+        }
+        for (char k = 7; k >= 0; k--) {
+            result = (result << 1) + tmp[k];
+        }
+        your_cipher[i] = result;
+    }
+    for (char i = 0; i < 15; i++) {
+        if (your_cipher[i] != cipher[i]) {
+            printf("Incorrect!");
+            return 1;
+        }
+    }
+    printf("GOOD! HERE IS YOUR FLAG ISPCTF{%s}", input);
+}
+```
+------------------
+>## **Overview & Idea** ##
+
+- Sau khi đọc đề ta thấy để ra được flag thì sau khi encrypt `input` đc `your_cipher` phải bằng với `cipher` .
+
+```C++
+
+    for (char i = 0; i < sizeof(input); i++) {
+        char tmp[8] = { 0,0,0,0,0,0,0,0 };
+        unsigned char result = 0;
+
+        for (char b = 0; b < 8; b++) {
+            char bit_1 = (input[i] >> b) & 1;
+            char bit_2 = key[b];
+            char rs = ISPCLUB(bit_1, bit_2);
+            tmp[b] = rs;
+        }
+        for (char k = 7; k >= 0; k--) {
+            result = (result << 1) + tmp[k];
+        }
+        your_cipher[i] = result;
+    }
+```
+- Thuật toán ở đây nó sẽ lấy từng kí tự mình nhập vào để encrypt
+từng kí tự với vòng for đầu tiên nó sẽ liên quan 8 bit của 1 kí tự :
+    +  `char bit_1 = (input[i] >> b) & 1;` ở bit_1 cho ta biết chức năng của nó dịch bit sang phải và `&1` để lấy từng bit từ phải sang trái.
+    + `bit_2` để lấy từng `value array key`.
+    + Bản chất của hàm `ISPCLUB()` là lấy bit_1 XOR  bit_2. Vậy tại sao tôi lại biết điều đó chúng ta hãy dùng tool rút gọn biểu thức logic : [WolframAlpha](https://www.wolframalpha.com/input?i=simplify+%28X+%7C%7C+Y%29+%7C%7C+X+%26%26+Y+%7C%7C+Y&fbclid=IwAR2rgIOZtSEbD7cuylLdqP6IrTIRA8A0waK4dJZ-atbSOfM9MG1M8vLvCaE)
+    ```C++
+    char ISPCLUB(char a, char b) {
+    return END(OO(a, LOST(b)), OO(LOST(a), b));
+    ```
+    +  Kết quả của hàm này sẽ return Bit_1 `XOR` Bit_2
+    ```C++
+    for (char k = 7; k >= 0; k--) {
+            result = (result << 1) + tmp[k];
+        }
+    ```
+    + Đến với hàm này có tác dụng ghép 8 bit lại sau khi tách ra để encrypt.
+
+>## **SOURCE SCRIPT** ##
+
+```C++
+#include <iostream>
+using namespace std;
+int main()
+{
+    int cipher[33] = {0xe7, 0x99, 0xdb, 0xf6, 0x98, 0xda, 0xf6, 0xda, 0x99, 0xf6, 0xe4, 0x9d, 0xce, 0x98, 0xca};
+    for (int i = 0; i < 15; i++)
+    {
+        cout << char(cipher[i] ^ 0xa9); //0xa9 là dạng hex của dãy key[]={1,0,0,1,0,1,0,1} mình sẽ đảo ngược chuỗi key ta sẽ đc dạng hex 0xa9
+        
+    }
+}
+//flag=ISPCTF{N0r_1s_s0_M4g1c}
+```
+![img](/CTF/CTF/WU_CTF/image/Screenshot%202022-10-20%20112646.png)
 
