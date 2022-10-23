@@ -7,10 +7,10 @@
 
 ------------------------------------
 
-![img](https://github.com/kienzx203/Write_upCTF/blob/image/Screenshot%202022-10-20%20025108.png)
+![img](https://github.com/kienzx203/Write_upCTF/blob/main/image/Screenshot%202022-10-20%20025108.png)
 >## CRYPTO.txt ##
 
-![img](https://github.com/kienzx203/Write_upCTF/blob/image/Screenshot%202022-10-20%20025144.png)
+![img](https://github.com/kienzx203/Write_upCTF/blob/main/image/Screenshot%202022-10-20%20025144.png)
 
 >## **Overview & Idea** ##
 
