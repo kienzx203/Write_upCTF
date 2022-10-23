@@ -348,5 +348,5 @@ int main()
 }
 //flag=ISPCTF{N0r_1s_s0_M4g1c}
 ```
-![img](Write_upCTF/image/Screenshot 2022-10-20 025108.png)
+![img](https://github.com/kienzx203/Write_upCTF/blob/main/image/Screenshot%202022-10-20%20112646.png)
 
